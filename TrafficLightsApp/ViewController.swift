@@ -7,6 +7,12 @@
 
 import UIKit
 
+enum LightColor {
+    case red
+    case yellow
+    case green
+}
+
 class ViewController: UIViewController {
     
     // MARK: - Views Properties
@@ -18,74 +24,50 @@ class ViewController: UIViewController {
     @IBOutlet var lightButton: UIButton!
     
     // MARK: - Lights Properties
-    var isRedLightOn = true
-    var isYellowLightOn = false
-    var isGreenLightOn = false
-    var lightColor = LightColor.red
+    
+    private let lightOn: CGFloat = 1
+    private let lightOff: CGFloat = 0.3
+    
+    private var currentLight = LightColor.green
     
     // MARK: - Initial
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupLightViews(for: [redLightView, yellowLightView, greenLightView])
-        lightButton.configuration = setupButton(with: "START")
+        redLightView.alpha = lightOff
+        yellowLightView.alpha = lightOff
+        greenLightView.alpha = lightOff
+    }
+    
+    override func viewDidLayoutSubviews() {
+        redLightView.layer.cornerRadius = redLightView.frame.width / 2
+        yellowLightView.layer.cornerRadius = yellowLightView.frame.width / 2
+        greenLightView.layer.cornerRadius = greenLightView.frame.width / 2
         
+        lightButton.layer.cornerRadius = 10
     }
     
     // MARK: - IBActions
     @IBAction func changeTraficLight() {
         
-        lightButton.configuration = setupButton(with: "NEXT")
-        
-        redLightView.backgroundColor = .red.withAlphaComponent(isRedLightOn ? 1 : 0.3)
-        yellowLightView.backgroundColor = .yellow.withAlphaComponent(isYellowLightOn ? 1 : 0.3)
-        greenLightView.backgroundColor = .green.withAlphaComponent(isGreenLightOn ? 1 : 0.3)
+        if lightButton.currentTitle == "START" {
+            lightButton.setTitle("NEXT", for: .normal)
+        }
 
-        switch lightColor {
+        switch currentLight {
         case .red:
-            isRedLightOn = false
-            isYellowLightOn = true
-            lightColor = .yellow
+            redLightView.alpha = lightOff
+            yellowLightView.alpha = lightOn
+            currentLight = .yellow
         case .yellow:
-            isYellowLightOn = false
-            isGreenLightOn = true
-            lightColor = .green
+            yellowLightView.alpha = lightOff
+            greenLightView.alpha = lightOn
+            currentLight = .green
         case .green:
-            isGreenLightOn = false
-            isRedLightOn = true
-            lightColor = .red
+            greenLightView.alpha = lightOff
+            redLightView.alpha = lightOn
+            currentLight = .red
         }
     }
-    
-    // MARK: - Settings
-    private func setupLightViews(for views: [UIView]) {
-        redLightView.backgroundColor = .red.withAlphaComponent(0.3)
-        yellowLightView.backgroundColor = .yellow.withAlphaComponent(0.3)
-        greenLightView.backgroundColor = .green.withAlphaComponent(0.3)
-        
-        for view in views {
-            view.layer.cornerRadius = view.frame.width / 2
-        }
-    }
-    
-    private func setupButton(with title: String) -> UIButton.Configuration {
-        var buttonConfiguration = UIButton.Configuration.filled()
-        buttonConfiguration.baseBackgroundColor = .systemBlue
-        buttonConfiguration.cornerStyle = .large
-        buttonConfiguration.title = title
-        buttonConfiguration.attributedTitle?.foregroundColor = .white
-        buttonConfiguration.attributedTitle?.font = .boldSystemFont(ofSize: 32)
-        
-        return buttonConfiguration
-    }
-}
 
-// MARK: - Extension
-extension ViewController {
-    enum LightColor {
-        case red
-        case yellow
-        case green
-    }
 }
-
